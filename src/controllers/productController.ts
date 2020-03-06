@@ -72,3 +72,23 @@ export const createProduct = async (
     return res.status(500).send(error.message);
   }
 };
+
+export const getProduct = async (req: Request, res: Response) => {
+  try {
+    const { name } = req.params;
+
+    const item = await productModel.findOne({ name: name });
+
+    if (!item) {
+      return res
+        .status(500)
+        .send("This item does not exist. Please create new Product.");
+    }
+
+    return res.status(200).json({
+      item
+    });
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+};
