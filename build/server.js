@@ -22,7 +22,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "16b50f76266cf6a323a7";
+/******/ 	var hotCurrentHash = "f80c7a64c41ac82472a0";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -799,6 +799,18 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexport
 
 /***/ }),
 
+/***/ "./src/controllers/productController.ts":
+/*!**********************************************!*\
+  !*** ./src/controllers/productController.ts ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nvar __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\n    return new (P || (P = Promise))(function (resolve, reject) {\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\n    });\n};\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst productModel = __webpack_require__(/*! ../models/productModel */ \"./src/models/productModel.ts\");\nconst categoryModel = __webpack_require__(/*! ../models/categoryModel */ \"./src/models/categoryModel.ts\");\nexports.createProduct = (req, res\n// next: NextFunction\n) => __awaiter(void 0, void 0, void 0, function* () {\n    try {\n        const { name, price, rating, link, category } = req.body;\n        // handles if  input doesn't follow Schema\n        if (!name || !price || !rating || !link || !category) {\n            res.status(400).send(\"Bad Request\");\n            return;\n        }\n        const findCategory = yield categoryModel.findOne({ name: category });\n        if (!findCategory) {\n            const newCatergory = new categoryModel({\n                name: category\n            });\n            yield newCatergory.save();\n            const { _id: categoryId } = newCatergory;\n            const newProduct = new productModel({\n                name,\n                price,\n                rating,\n                link,\n                categoryId\n            });\n            yield newProduct.save();\n            return res.status(200).json({\n                _id: newProduct._id,\n                name: newProduct.name,\n                price: newProduct.price,\n                raing: newProduct.rating,\n                link: newProduct.link,\n                category\n            });\n        }\n        const { _id: categoryId } = findCategory;\n        const newProduct = new productModel({\n            name,\n            price,\n            rating,\n            link,\n            categoryId\n        });\n        yield newProduct.save();\n        return res.status(200).json({\n            _id: newProduct._id,\n            name: newProduct.name,\n            price: newProduct.price,\n            rating: newProduct.rating,\n            link: newProduct.link,\n            category\n        });\n    }\n    catch (error) {\n        return res.status(500).send(error.message);\n    }\n});\nexports.getProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {\n    try {\n        const { name } = req.params;\n        const item = yield productModel.findOne({ name: name });\n        if (!item) {\n            return res\n                .status(500)\n                .send(\"This item does not exist. Please create new Product.\");\n        }\n        return res.status(200).json({\n            item\n        });\n    }\n    catch (error) {\n        return res.status(400).send(error.message);\n    }\n});\nexports.getByCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {\n    try {\n        const { category } = req.params;\n        const findCategory = yield categoryModel.findOne({ name: category });\n        console.log(\"Found category: \", findCategory);\n        if (!findCategory) {\n            return res.status(500).send(\"Category does not Exist\");\n        }\n        const products = yield productModel\n            .find({ categoryId: findCategory._id })\n            .sort({ rating: -1 });\n        return res.status(200).send({ products });\n    }\n    catch (error) {\n        return res.status(400).send(error.message);\n    }\n});\n\n\n//# sourceURL=webpack:///./src/controllers/productController.ts?");
+
+/***/ }),
+
 /***/ "./src/database/index.ts":
 /*!*******************************!*\
   !*** ./src/database/index.ts ***!
@@ -811,6 +823,30 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\n// tsl
 
 /***/ }),
 
+/***/ "./src/models/categoryModel.ts":
+/*!*************************************!*\
+  !*** ./src/models/categoryModel.ts ***!
+  \*************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst mongoose = __webpack_require__(/*! mongoose */ \"mongoose\");\nconst Schema = new mongoose.Schema({\n    name: {\n        type: String\n    }\n}, {\n    collection: \"category\"\n});\nmodule.exports = mongoose.model(\"Category\", Schema);\n\n\n//# sourceURL=webpack:///./src/models/categoryModel.ts?");
+
+/***/ }),
+
+/***/ "./src/models/productModel.ts":
+/*!************************************!*\
+  !*** ./src/models/productModel.ts ***!
+  \************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst mongoose = __webpack_require__(/*! mongoose */ \"mongoose\");\nconst Schema = new mongoose.Schema({\n    name: {\n        type: String,\n        required: true\n    },\n    price: {\n        type: String,\n        required: true\n    },\n    rating: {\n        type: Number,\n        required: true\n    },\n    link: {\n        type: String,\n        required: true\n    },\n    categoryId: {\n        type: String,\n        required: true\n    },\n    isActive: {\n        type: Boolean,\n        default: true\n    }\n}, {\n    collection: \"product\"\n});\nmodule.exports = mongoose.model(\"Product\", Schema);\n\n\n//# sourceURL=webpack:///./src/models/productModel.ts?");
+
+/***/ }),
+
 /***/ "./src/routes.ts":
 /*!***********************!*\
   !*** ./src/routes.ts ***!
@@ -819,7 +855,7 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\n// tsl
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst express = __webpack_require__(/*! express */ \"express\");\nconst cors = __webpack_require__(/*! cors */ \"cors\");\nconst bodyParser = __webpack_require__(/*! body-parser */ \"body-parser\");\nconst app = express();\napp.use(cors());\napp.use(bodyParser.json());\napp.use(bodyParser.urlencoded({ extended: false }));\nexports.default = app;\n\n\n//# sourceURL=webpack:///./src/routes.ts?");
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst express = __webpack_require__(/*! express */ \"express\");\nconst cors = __webpack_require__(/*! cors */ \"cors\");\nconst bodyParser = __webpack_require__(/*! body-parser */ \"body-parser\");\nconst app = express();\nconst productController_1 = __webpack_require__(/*! ./controllers/productController */ \"./src/controllers/productController.ts\");\napp.use(cors());\napp.use(bodyParser.json());\napp.use(bodyParser.urlencoded({ extended: false }));\n// HTTPS Request\napp.post(\"/api/product\", (req, res) => productController_1.createProduct(req, res));\napp.get(\"/api/:name\", (req, res) => productController_1.getProduct(req, res));\napp.get(\"/api/products/:category\", (req, res) => productController_1.getByCategory(req, res));\nexports.default = app;\n\n\n//# sourceURL=webpack:///./src/routes.ts?");
 
 /***/ }),
 

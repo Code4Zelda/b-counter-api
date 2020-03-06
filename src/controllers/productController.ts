@@ -92,3 +92,24 @@ export const getProduct = async (req: Request, res: Response) => {
     return res.status(400).send(error.message);
   }
 };
+
+export const getByCategory = async (req: Request, res: Response) => {
+  try {
+    const { category } = req.params;
+
+    const findCategory = await categoryModel.findOne({ name: category });
+    console.log("Found category: ", findCategory);
+
+    if (!findCategory) {
+      return res.status(500).send("Category does not Exist");
+    }
+
+    const products = await productModel
+      .find({ categoryId: findCategory._id })
+      .sort({ rating: -1 });
+
+    return res.status(200).send({ products });
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+};
